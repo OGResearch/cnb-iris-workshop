@@ -8,10 +8,10 @@
 
 !transition-variables
 
-    'Output Gap' y
-    'Inflation Q/Q' pi, 'Inflation Y/Y' pi4
-    'Policy Rate', r, 'Inflation Target' t, r_unc
-    'Central Bank Credibility' c, 'Signal to Credibility' s
+    "Output Gap" y
+    "Inflation Q/Q" pi, "Inflation Y/Y" pi4
+    "Policy Rate", r, "Inflation Target" t, r_unc
+    "Central Bank Credibility" c, "Signal to Credibility" s
     
 %
 
@@ -31,15 +31,15 @@
     
 !transition-shocks
 
-    'Demand shock' ey, 'Cost-push shock' epi
-    'Change in inflation target' et  
-    'Monetary policy shock' er
+    "Demand shock" ey, "Cost-push shock" epi
+    "Change in inflation target" et  
+    "Monetary policy shock" er
     
 %    
     
 %% Write equations
 %
-% Brief discussion of the nonlinearities.
+% Brief discussion of the nonlinearities
 %
 % # The Phillips curve has the following form:
 %    $$ \pi_t - \pi_{t-1} = \beta_t^\star \, \mathrm E_t \left[ \pi_{t+1} -
@@ -77,31 +77,31 @@
 !transition-equations
 
     % Aggregate Demand
-    'Aggregate Demand' y = alp1*y{-1} ...
+    "Aggregate Demand" y = alp1*y{-1} ...
         + alp2*y{1} - sgm*(r - pi{1} - rho) + ey;
     
     % Convex (Nonlinear) Phillips curve
-    'Phillips curve' pi - pi{-1} ...
+    "Phillips curve" pi - pi{-1} ...
         = c*bet*(pi{1} - pi) + gam/del*(exp(del*y)-1) + epi; %?phillips?
     
     % Simple Monetary Policy Rule
-    'Policy Rule' r_unc = the*r{-1} ...
+    "Policy Rule" r_unc = the*r{-1} ...
         + (1-the)*(rho + t + kap*(pi4{3} - t{3})) + er;
 
     r = max(r_unc, 0) !! r = r_unc;
     % r = r_unc;
     
     % Definition of Y/Y Inflation
-    'Y/Y Inflation' pi4 = movavg(pi, -4);
+    "Y/Y Inflation" pi4 = movavg(pi, -4);
 
     % Inflation target: `phi` is either 0 or 1
-    'Inflation Target' t = phi*(t{-1} + et) + (1-phi)*tau;
+    "Inflation Target" t = phi*(t{-1} + et) + (1-phi)*tau;
 
     % Law of Motion for the Stock of Central Bank Credibility
-    'Credibility Stock' c = psi*c{-1} + (1-psi)*s;
+    "Credibility Stock" c = psi*c{-1} + (1-psi)*s;
         
 	% Credibility Signal Responding to Deviations in Inflation From Target
-    'Credibility Signal' s = exp(-(omg*(pi4{-1} - t{-1}))^2); %?credibilitySignal?
+    "Credibility Signal" s = exp(-(omg*(pi4{-1} - t{-1}))^2); %?credibilitySignal?
 
 
 !measurement_variables
@@ -110,9 +110,10 @@
     obs_pi
     obs_r
 
+
 !measurement_equations
 
-    'Observed Output' obs_y = y;
-    'Observed Inflation' obs_pi = pi;
-    'Observed Policy Rate' obs_r = r;
+    "Observed Output" obs_y = y;
+    "Observed Inflation" obs_pi = pi;
+    "Observed Policy Rate" obs_r = r;
 
