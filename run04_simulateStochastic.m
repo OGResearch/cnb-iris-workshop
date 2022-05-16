@@ -25,32 +25,41 @@ load mat/createModel.mat m
 % the model after new std deviations have been changed since they do not
 % affect the first-order approximate solution matrices.
 
+m.slope_r = 0;
+m = solve(m);
 
-m.std_er = 0.2;
-m.std_ey = 0.4;
-m.std_epi = 0.4;
-m.std_et = 0;
+m = rescaleStd(m, 0);
+
+m.std_shk_r = 0.2;
+m.std_shk_y_tnd = 0.02;
+m.std_shk_y_gap = 0.4;
+m.std_shk_pie = 0.4;
+m.std_shk_targ = 0;
 
 
 %% Create Steady-State Database with Random Shocks
 %
 % Call the function `sstatedb` to create a database with each model being
 % variable assigned its steady-state value. The range on which these time
-% series are created on a range -2:20, and not just 1:20 as the second
+% series are created on a range -2:20, and not just 1:T as the second
 % input argument says. This is because `sstatedb` automatically looks up
 % the maximum lag in the model and adjusts the range accordingly to include
 % all necessary initial conditions so that a simulation can start at time
 % t=1.
 %
 % With the option `shockFunc=@randn`, the model shocks are randomly drawn
-% on the range 1:20 from a normal distribution with mean zero and std
+% on the range 1:T from a normal distribution with mean zero and std
 % deviations given by the model object.
 
+T = 10; 100;
+N = 1;
+display = "final";
+
 rng(0);
-d = steadydb(m, 1:20, "shockFunc", @randn);
+d = steadydb(m, 1:T, "shockFunc", @randn, "numColumns", N);
 
 
-%% Linearized Simulation
+%% First-order simulation
 %
 % First, simulate the random shocks using first-order approximate solution
 % (linearized model). The shocks are simulated as unanticipated. Note that
@@ -59,16 +68,17 @@ d = steadydb(m, 1:20, "shockFunc", @randn);
 
 d1 = d;
 [s1, info1] = simulate( ...
-    m, d, 1:20 ...
+    m, d, 1:T ...
     , "prependInput", true ...
     , "anticipate", false ...
 );
 
-%% Nonlinear Simulations
+
+%% Nonlinear simulations
 %
 % Next, simulate the random shocks using a nonlinear simulation method: a
 % so-called stacked-time algorithm. Because the shocks are unanticipated,
-% the whole simulation range, 1:20, must be segmented into so-called
+% the whole simulation range, 1:T, must be segmented into so-called
 % simulation frames, defined by the occurence of unanticipated shocks. As a
 % result, a total of 20 overlapping sub-simulations, one for each frame,
 % will be run. 
@@ -101,32 +111,32 @@ d1 = d;
 
 % Simulate random shocks with full credibility initially
 
-solverOptions = { 
-    'iris-newton', 'skipJacobUpdate', 2
-};
 
 d2 = d;
-d2.c(0) = 1;
+d2.c(-2:0) = 1;
 [s2, info2] = simulate( ...
-    m, d2, 1:20 ...
+    m, d2, 1:T ...
     , 'prependInput', true ...
     , 'anticipate', false ...
     , 'method', 'stacked' ...
+    , 'solver', {'quickNewton', 'display', display} ...
 );
+
 
 % Simulate random shocks wih low credibility initially.
 
 d3 = d;
-d3.c(0) = 0.1; % Low initial credibility
+d3.c(-2:0) = 0.1; % Low initial credibility
 s3 = simulate( ...
-    m, d3, 1:20 ...
-    , 'PrependInput=', true ...
-    , 'Anticipate=', false ...
-    , 'Method=', 'stacked' ...
+    m, d3, 1:T ...
+    , 'prependInput', true ...
+    , 'anticipate', false ...
+    , 'method', 'stacked' ...
+    , 'solver', {'quickNewton', 'display', display} ...
 );
 
 
-%% Plot Simulation Results
+%% Plot simulation results
 %
 % Plot the simulated paths for all three simulations in one graph to
 % compare the effect of nonlinearities:
@@ -147,29 +157,23 @@ s3 = simulate( ...
 % same positive shocks to the output gap will cause inflation to shoot up
 % more).
 
-listToPlot = [
-    " 'Inflation' pi"
-    " 'Credibility' c"
-    " 'Output gap' y"
-    " 'Policy rate' r"
-];
+ch = databank.Chartpack();
+ch.Range = 0 : T;
+ch < access(m, "transition-variables");
 
-dbplot( ...
-    s1 & s2 & s3, 0:20, listToPlot ...
-    , 'zeroLine', true ...
-    , 'tight=', true ...
-    , 'marker=', '.' ...
-);
+c = 1;
+chartDb = databank.merge("horzcat", databank.retrieveColumns(s1, c), databank.retrieveColumns(s2, c), databank.retrieveColumns(s3, c)); 
+draw(ch, chartDb);
 
 visual.hlegend( ...
     "bottom" ...
-    , "Linearized Simulation" ...
-    , "Nonlin Simulation with High Initial Credibility" ...
-    , "Nonlin Simulation with Low Initial Credibility" ...
+    , "First-order simulation" ...
+    , "Nonlin simulation with high initial credibility" ...
+    , "Nonlin simulation with low initial credibility" ...
 );
 
 
-%% Inverted Simulation
+%% Inverted simulation
 %
 % Taking the results of the nonlinear simulation with low credibility,
 % fix (exogenize) the three macro variables, `y`, `pi` and `r`, to their
@@ -177,31 +181,31 @@ visual.hlegend( ...
 % reproduce these paths. These shocks should, of course, be identical to
 % those used in the original simulation.
 
-p = Plan(m, 1:20, "anticipate", false);
-p = exogenize(p, 1:20, ["y", "pi", "r"]); 
-p = endogenize(p, 1:20, ["ey", "epi", "er"]); 
+p = Plan.forModel(m, 1:T, "anticipate", false);
+p = exogenize(p, 1:T, ["y_gap", "y_tnd", "pie", "r"]); 
+p = endogenize(p, 1:T, ["shk_y_gap", "shk_y_tnd", "shk_pie", "shk_r"]); 
 
 s4 = simulate( ...
-    m, s3, 1:20, ...
+    m, s3, 1:T, ...
     "prependInput", true, ...
     "ignoreShocks", true, ...
     "plan", p, ...
     "method", "stacked", ...
-    "solver", solverOptions ...
+    'solver', {'quickNewton', 'display', display} ...
 );
 
-[s3.ey, s4.ey]
+[s3.shk_y_gap, s4.shk_y_gap]
 
-max(abs(s3.ey - s4.ey))
-max(abs(s3.epi - s4.epi))
-max(abs(s3.er - s4.er))
+max(abs(s3.shk_y_gap - s4.shk_y_gap))
+max(abs(s3.shk_pie - s4.shk_pie))
+max(abs(s3.shk_r - s4.shk_r))
 
 
-%% Save Everything for Further Use
+%% Save everything for further use
 %
 % Save the model object and the simulated databases to a mat (binary) file
 % for further use in other files.
 %
 
-save mat/simulateStochastic.mat m s1 s2 s3
+save mat/simulateStochastic.mat m s1 s2 s3 d1 d2 d3
 

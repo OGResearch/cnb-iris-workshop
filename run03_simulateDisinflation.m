@@ -76,14 +76,15 @@ load mat/createModel.mat m
 %
 % These extra output argument are analyzed below.
 
-m.phi = 1; 
+m.rho_targ = 1; 
+m.slope_r = 0;
 checkSteady(m);
 m = solve(m);
 
 d = steadydb(m, 1:40);
-d.et(1) = -1;
+d.shk_targ(1) = -1;
 
-%% High Credibility Initially
+%% High credibility initially 
 
 d1 = d;
 d1.c(-2:0) = 1;
@@ -99,7 +100,6 @@ l1 = simulate( ...
     , "method", "stacked" ...
 );
 
-
 %% Medium Credibility Initially
 
 d2 = d;
@@ -109,6 +109,7 @@ l2 = simulate( ...
     m, d2, 1:40 ...
     , "prependInput", true ...
 );
+
 
 [n2, info2] = simulate( ...
     m, d2, 1:40 ...
@@ -134,32 +135,18 @@ l3 = simulate( ...
 );
 
 
-%% Report Results
+%% Report
 
-sty = struct( );
-sty.Line.Marker = {"s", "none", "s", "none", "s", "none"};
-sty.Line.LineWidth = {2, 1.5, 2, 1.5, 2, 1.5};
-sty.Line.LineStyle = {"none", "-", "none", "-", "none", "-"};
+ch = databank.Chartpack();
+ch.Range = 0:40;
+ch.Round = 8;
 
-dbplot( ...
-    l1 & n1 & l2 & n2 & l3 & n3, 0:40, get(m, "xnames") ...
-    , "caption", @comment ...
-    , "tight", true ...
-    , "zeroLine", true ...
-    , "subPlot", [3, 3] ...
-    , "visualStyle", sty ...
-);
+ch < access(m, "transition-variables");
+ch < "cumsum(y_gap)/4";
 
-visual.hlegend( ...
-    "Bottom" ...
-    , "High Credibility, Linearized" ...
-    , "High Credibility, Nonlinear" ...
-    , "Medium Credibility, Linearized" ...
-    , "Medium Credibility, Nonlinear" ...
-    , "Low Credibility, Linearized" ...
-    , "Low Credibility, Nonlinear" ...
-);
+draw(ch, databank.merge("horzcat", l1, l2, l3));
+visual.heading("First-order simulations");
 
-visual.heading("Disinflation");
-
+draw(ch, databank.merge("horzcat", n1, n2, n3));
+visual.heading("Stacked-time nonlinear simulations");
 

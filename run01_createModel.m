@@ -1,7 +1,7 @@
 %% Read and Solve the Nonlinear Credibility Model
 %
 % In this m-file script, we read the endogenous credibility model file,
-% `endogenousCredibility.model`, assign its parameters, find the steady
+% `endogenous-credibility.model`, assign its parameters, find the steady
 % state of the model, calculate the first-order solution matrices, and save
 % everything for future use. 
 
@@ -14,34 +14,43 @@ clear
 %% Load and Calibrate Endogenous Credibility Model
 %
 % Call the Model object constructor `Model( )` to read the model file
-% `endogenousCredibility.model` and create a model object. Calibrate the model
-% parameters. Note that the parameter `del`, which determines the convexity
+% `endogenous-credibility.model` and create a model object. Calibrate the model
+% parameters. Note that the parameter `delta`, which determines the convexity
 % of the Phillips curve, must be greater than zero.
 
-m = Model("endogenousCredibility.model");
+m = Model.fromFile("model-source/endogenous-credibility.model");
 
-m.alp1 = 0.75;
-m.alp2 = 0.1;
-m.sgm = 0.1;
-m.bet = 0.99;
-m.gam = 0.05;
-m.del = 0.4;
-m.the = 0.80;
-m.kap = 4;
-m.phi = 0;
-m.tau = 3;
-m.rho = 2;
-m.psi = 0.97;
-m.omg = 1;
+m.ss_rr = 0;
+m.ss_pie = 2;
 
-get(m, "Parameters")
+m.alpha = 0.1;
+m.sigma = 0.1;
+m.sigma0 = 0;
+m.beta = 0.99;
+m.gamma = 0.10;
+m.delta = 1;
+m.lambda = 0.05;
+m.kappa = 4;
+m.rho_targ = 0;
+m.omega = 1;
+
+m.slope_r = 0;
+
+m.rho_y_gap = 0.75;
+m.rho_c = 0.97;
+m.rho_r = 0.80;
+m.rho_y_tnd = 0.90;
+
+m.c = 1;
+
+access(m, "parameter-values")
 
 %% Find Steady State
 %
 % In nonlinear models, the steady-state needs to be found (numerically)
 % first, before we calculate the first-order solution matrices. By default,
 % the function `steady( )` assumes that the model does not have nonzero
-% growth rates in any of its variables -- the `endogenousCredibility.model`
+% growth rates in any of its variables -- the `endogenous-credibility.model`
 % complies with this assumption. It is a good idea to always verify that
 % the calculated steady-state holds (the function `checkSteady( )`
 % would throw an error message with the list of inaccurate equations).
@@ -51,6 +60,7 @@ checkSteady(m);
 
 table(m, ["SteadyLevel", "SteadyChange", "Form", "Description"])
 
+
 %% Calculate First-Order Solution Matrices
 %
 % The first-order solution matrices are not only used in
@@ -59,7 +69,8 @@ table(m, ["SteadyLevel", "SteadyChange", "Form", "Description"])
 
 m = solve(m);
 
+
 %% Save Everything for Further Use
 
-save mat/createModel.mat m
+save mat/createModel.mat m 
 
