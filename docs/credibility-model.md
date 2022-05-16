@@ -43,7 +43,7 @@ $$
 c_t = \psi \, c_{t-1} + (1-\psi) \, s_t
 $$
 
-$s_t$ is a new credibility signal
+$s_t$ is a credibility update signal
 
 
 ---

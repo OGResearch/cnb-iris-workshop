@@ -5,7 +5,7 @@
 % the central bank.
 %
 
-%% Declare variables
+%% Declare variables, parameters, shocks
 
 !transition-variables
 
@@ -21,9 +21,6 @@
     "Central bank credibility" c 
     "Signal to credibility" s
 
-%
-
-%% Declare parameters
 
 !parameters
 
@@ -38,12 +35,8 @@
     rho_r, kappa, rho_targ
     rho_c, omega
 
-%
 
-%% Declare shocks
-
-
-!transition-shocks(:cond)
+!transition-shocks
 
     "Potential output shock" shk_y_tnd
     "Demand shock" shk_y_gap
@@ -52,12 +45,9 @@
     "Monetary policy shock" shk_r
     "Credibility shock" shk_c
 
-%
 
-!transition-shocks
-    shk_y_gap2, shk_r2
 
-%% Write equations
+%% Transition equations
 %
 % Brief discussion of the nonlinearities
 %
@@ -105,7 +95,7 @@
     y_gap = 
         + rho_y_gap*y_gap{-1} ...
         + alpha*y_gap{1} - sigma*(rr - ss_rr) + sigma0*(r - r_unc) ...
-        + shk_y_gap + shk_y_gap2;
+        + shk_y_gap;
 
 
     "Real interest rate"
@@ -113,7 +103,7 @@
 
 
     "Phillips curve"
-    pie - pie{-1} =# ...
+    pie - pie{-1} = ...
         + c*beta*(pie{1} - pie) - lambda*(pie4 - targ) ...
         + gamma/delta*(exp(delta*y_gap)-1) ...
         + shk_pie; 
@@ -123,9 +113,9 @@
     r_unc = ... 
         + rho_r*r{-1} ...
         + (1-rho_r)*(ss_rr + targ + kappa*(pie4{3} - targ{3})) ...
-        + shk_r + shk_r2;
+        + shk_r;
 
-    r =# slope_r*r_unc + (1-slope_r)*max(r_unc, 0);
+    r = slope_r*r_unc + (1-slope_r)*max(r_unc, 0);
 
 
     "CPI inflation Y/Y"
@@ -141,17 +131,19 @@
 
 
     "Credibility signal" 
-    s =# exp(-(omega*(pie4{-1} - targ{-1}))^2);
+    s = exp(-(omega*(pie4{-1} - targ{-1}))^2);
 
 
+
+%% Measurement block
+   
 !measurement-variables
 
     obs_y
     obs_pie
     obs_r
     obs_c
-
-% 
+ 
 
 !measurement-shocks
 
@@ -165,5 +157,4 @@
     obs_r = r;
     obs_c = c;
 
-% 
 
