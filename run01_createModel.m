@@ -9,6 +9,8 @@
 
 close all
 clear
+mkdir mat
+
 %#ok<*NOPTS>
  
 %% Load and Calibrate Endogenous Credibility Model
