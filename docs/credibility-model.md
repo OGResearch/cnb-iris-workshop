@@ -3,7 +3,7 @@
 
 ---
 
-# Output Gap
+## Output Gap
 
 $$
 y_t = \alpha \, y_{t-1} + (1-\alpha) \, y_{t+1} + \sigma \, 
@@ -12,7 +12,7 @@ $$
 
 ---
 
-# Convex Phillips Curve
+## Convex Phillips Curve
 
 $$ 
 \pi_t - \pi_{t-1} = \beta_t^\star  \left( \pi_{t+1} -
@@ -22,7 +22,7 @@ $$
 
 ---
 
-# Credibility-Driven Discounting
+## Credibility-Driven Discounting
 
 $$ 
 \beta^\star_t = c_t \, \beta
@@ -37,7 +37,7 @@ $$c_t\in(0,1)$$ time-varying (endogenous) credibility of CB
 
 ---
 
-# Stock of Credibility 
+## Stock of Credibility 
 
 $$
 c_t = \psi \, c_{t-1} + (1-\psi) \, s_t
@@ -48,7 +48,7 @@ $s_t$ is a credibility update signal
 
 ---
 
-# Credibility Signal
+## Credibility Signal
 
 $$
 s_t = \exp \left[
@@ -60,7 +60,7 @@ $$
 
 ---
 
-# Monetary Policy Reaction Function
+## Monetary Policy Reaction Function
 
 $$
 r_t^\mathrm{unc} = \theta\, r_{t-1} + (1-\theta) \left[
