@@ -86,6 +86,7 @@
 
 !transition-equations
 
+    "Output"
     y = y_tnd + y_gap;
 
     diff(y_tnd) = rho_y_tnd*diff(y_tnd{-1}) + shk_y_tnd 
