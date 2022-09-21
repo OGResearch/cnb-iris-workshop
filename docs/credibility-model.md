@@ -90,6 +90,6 @@ r_t^\mathrm{unc} = \theta\, r_{t-1} + (1-\theta) \left[
 $$
 
 $$
-r_t = \max \left( r_t^\mathrm{unc}, \, 0 \right)
+r_t = \max \left( r_t^\mathrm{unc}, 0 \right)
 $$
 
