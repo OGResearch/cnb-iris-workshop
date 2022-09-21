@@ -77,7 +77,7 @@ where $omega>0$ and $k=\{2, 4, \dots\}$
 
 ## Credibility signal function for different parameters
 
-![[credibility-signal.png]]
+![credibility-signal.png]
 
 ---
 
