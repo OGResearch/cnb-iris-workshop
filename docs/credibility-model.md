@@ -84,10 +84,12 @@ where $omega>0$ and $k=\{2, 4, \dots\}$
 ## Monetary policy reaction function
 
 $$
-r_t^\mathrm{unc} = \theta\, r_{t-1} + (1-\theta) \left[ \rho + \pi^\mathrm{targ} + \kappa\left( \pi4_{t+3} - \pi^\mathrm{targ} \right) \right] + \epsilon_{r,t}
+r_t^\mathrm{unc} = \theta\, r_{t-1} + (1-\theta) \left[
+\rho + \pi^\mathrm{targ} + \kappa\left( \pi4_{t+3} - \pi^\mathrm{targ}
+\right) \right] + \epsilon_{r,t}
 $$
 
 $$
-r_t = \max\left\{ r_t^\mathrm{unc}, \, 0 \right\}
+r_t = \max \left\[ r_t^\mathrm{unc}, \, 0 \right\]
 $$
 
