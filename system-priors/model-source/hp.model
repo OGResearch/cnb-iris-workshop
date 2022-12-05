@@ -1,0 +1,19 @@
+
+!transition-variables
+    gap, trend
+
+!transition-shocks
+    shock_gap
+    shock_trend
+
+!transition-equations
+    gap = shock_gap;
+    diff(trend) = diff(trend{-1}) + shock_trend;
+
+!measurement-variables
+    x, dx
+
+!measurement-equations
+    x = trend + gap;
+    dx = diff(trend) + diff(gap);
+
