@@ -1,0 +1,64 @@
+%% Simple demography model
+
+!variables
+
+    !list(`n)
+
+
+!parameters
+
+    !list(`p)
+    A
+    nmr<A>
+
+
+!log-variables
+
+    Q
+
+
+!exogenous-variables
+    !list(`x)
+
+
+!equations
+
+    "dQ" QQ0`n * dQ`n = [ br0`n * QQ0{-1} ]+..+[ br<A>`n * QQ<A>{-1} ];
+    "DTHQ0" DTHQ0`n = (1-sr0`x) * QQ0;
+    "BTHQ0" BTHQ0`n = br0`n * QQ0;
+    "br0" br0`n = fr0`x / (1 + xr0`x);
+
+    !for
+        ? = <1:A>
+    !do
+        "QQ?" QQ?`n * dQ`n = ( sr<?-1>`x * QQ<?-1>{-1} + nmr<?-1>`x * NMQ`n );
+        "DTHQ?" DTHQ?`n = (1-sr?`x) * QQ?;
+        "BTHQ?" BTHQ?`n = br?`n * QQ?;
+        "br?" br?`n = fr?`x / (1 + xr?`x);
+    !end
+
+    "QQ0" 1 = QQ0 +..+ QQ<A>;
+    "NMQ" NMQ`n = nmr`x;
+
+    "BTHQ" BTHQ`n = BTHQ0 +..+ BTHQ<A>;
+    "DTHQ" DTHQ`n = DTHQ0 +..+ DTHQ<A>;
+    "cbr" cbr`n = BTHQ;
+    "cdr" cdr`n = DTHQ;
+    "cxr" cxr`n = [ xr0*QQ0 ]+..+[ xr99*QQ99 ];
+    "cfr" cfr`n = cbr * (1 + cxr);
+    "WAPQ" WAPQ`n = QQ16 +..+ QQ64;
+
+    "Q" Q`n = dQ * Q{-1};
+
+!postprocessor
+
+    !for
+        ? = <0:A>
+    !do
+        "Q<?>" Q<?>`r = QQ<?> * Q;
+    !end
+
+    "WAP" WAP`r = WAPQ * Q;
+    "NM" NM`r = NMQ * Q;
+
+

@@ -1,0 +1,135 @@
+%% Overlapping generations closed economy model
+
+!variables
+
+    !list(`n)
+
+
+!parameters
+
+    !list(`p)
+    chi_h
+
+
+!log-variables !all_but
+
+    fpc<a1> ,.., fpc<aa>
+    chk<a1> ,.., chk<aa>
+
+
+!substitutions
+
+    !for
+        ? = <a1 : aa>
+    !do
+        w? = (z?`p*w0);
+        prem? = (1 + psi`p*(-rd*fpc?*p*c/(ph*h?)) + phi`p*(p*c?-$w?$*n)/($w?$*n));
+    !end
+
+
+    !for
+        ? = <a1>
+    !do
+        fo? = 0;
+        ho? = (0 + zeta*h<aa>{-1});
+    !end
+
+
+    !for
+        ? = <a1+1 : aa>
+    !do
+        fo? = (rd{-1}*fpc<?-1>{-1}*p{-1}*c{-1});
+        ho? = (h<?-1>{-1} + zeta*h<aa>{-1});
+    !end
+
+
+!equations
+
+    % Newly borns
+    q0`n = q0{-1} * ss_dq0`p;
+
+
+    % Households: Aged a1
+    !for
+        ? = <a1>
+    !do
+        lmb?*ph`n = omega`p/(h?`n-chi_h*0) + beta?`p*lmb<?+1>{+1} * (1-delta_h`p)*ph{+1};
+        lmb?`n = beta?`p * lmb<a1+1>{+1} * rd`n * $prem?$;
+        q?`n = q0;
+    !end
+
+
+    % Households: Aged a1+1 : aa-1
+    !for
+        ? = <a1+1 : aa-1>
+    !do
+        lmb?*ph = omega/(h?`n-chi_h*h<?-1>{-1}) + beta?`p*lmb<?+1>{+1} * (1-delta_h)*ph{+1};
+        lmb?`n = beta?`p * lmb<?+1>{+1} * rd * $prem?$;
+        chk? = 0;
+        q?`n = q<?-1>{-1};
+    !end
+
+
+    % Households - terminal
+    !for
+        ? = <aa>
+    !do
+        lmb?*ph = omega/(h?`n-chi_h*h<?-1>{-1}) + kappa`p/(ph*h? + fpc?`n*p*c)*ph;
+        fpc?`n = 0;
+        chk? = 0;
+        q?`n = q<?-1>{-1};
+    !end
+
+
+    % All households
+    !for
+        ? = <a1 : aa>
+    !do
+        lmb?`n*p*c?`n = 1;
+        chk?`n = $fo?$ + $w?$*n - p*c? - ph*(h? - $ho?$*(1-delta_h)) - fpc?`n*p*c;
+    !end
+
+
+    % Negotiated wage rate
+    w0`n = p*c * n`n^eta`p;
+
+
+    % Average wage rate
+    w*q = w0*( [ z<a1>*q<a1> ]+..+[ z<aa>*q<aa> ] );
+
+
+    % Production
+    y`n = (z*n);
+    z`n = z{-1} * ss_dz`p;
+    py`n*y = w`n*n;
+    p`n = mu_y`p*py;
+
+    p = ss_p`p;
+
+    % Aggregation and market clearing
+    [ fpc<a1>*q<a1> ] +..+ [ fpc<aa>*q<aa> ] = 0;
+
+    c`n*q = [ c<a1>*q<a1> ] +..+ [ c<aa>*q<aa> ];
+    y*q = c*q + ih*q;
+    h*q = [ h<a1>*q<a1> ] +..+ [ h<aa>*q<aa> ];
+    k`n = 1;
+    ph = p;
+    h`n*q = h{-1}*q{-1}*(1-delta_h) + ih`n*q;
+    pr`n = 1;
+    q`n = q<a1> +..+ q<aa>;
+    zeta`n * q = q<aa>{-1};
+
+
+!postprocessor
+
+    !for
+        ? = <a1 : aa>
+    !do
+        w? = $w?$;
+        prem? = $prem?$;
+        ho? = $ho?$;
+        f? = fpc? * p * c;
+        fo? = $fo?$;
+        hx? = zeta * h<aa>{-1};
+    !end
+
