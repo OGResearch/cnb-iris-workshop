@@ -1,0 +1,33 @@
+
+
+
+
+
+!for
+    cpi, gdp
+!do
+    !preprocessor
+        l_? = 100*log(?);
+        dl_? = 4*(l_? - l_?{-1});
+
+    !variables
+        dl_?
+    !parameters
+        rho_dl_?, ss_dl_?
+    !shocks
+        shk_dl_?
+    !equations
+        dl_? = rho_dl_? * dl_?{-1} + (1-rho_dl_?) * ss_dl_? + shk_dl_?;
+
+
+    !postprocessor
+        l_? = l_?{-1} + dl_?/4;
+        ? = exp(l_?/100);
+
+!end
+
+
+
+
+
+
