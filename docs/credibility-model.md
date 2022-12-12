@@ -12,9 +12,9 @@ $$
 
 ---
 
-## Convex phillips curve
+## Convex Phillips curve
 
-* The forward-lookingnes of the Phillips curve is determined by
+* The forward-lookingness of the Phillips curve is determined by
   $\beta_t^\star\in(0,\,1)$, a discounting variable that moves endogenously with the
   level of credibility of the central bank
 
