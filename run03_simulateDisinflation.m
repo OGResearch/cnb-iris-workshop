@@ -81,7 +81,7 @@ m.slope_r = 0;
 checkSteady(m);
 m = solve(m);
 
-d = steadydb(m, 1:40);
+d = databank.forModel(m, 1:40);
 d.shk_targ(1) = -1;
 
 %% High credibility initially 
@@ -137,12 +137,12 @@ l3 = simulate( ...
 
 %% Report
 
-ch = databank.Chartpack();
+ch = Chartpack();
 ch.Range = 0:40;
 ch.Round = 8;
 
-ch < access(m, "transition-variables");
-ch < "cumsum(y_gap)/4";
+ch + access(m, "transition-variables");
+ch + "cumsum(y_gap)/4";
 
 draw(ch, databank.merge("horzcat", l1, l2, l3));
 visual.heading("First-order simulations");
