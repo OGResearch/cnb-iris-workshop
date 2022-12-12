@@ -1,0 +1,16 @@
+
+!variables
+    x, y, z
+
+!shocks
+    shk_y, shk_z
+
+!equations
+
+    x = wy * y + (1 - wy)*z;
+    y = 0.8*y{-1} + shk_y;
+    z = 0.9*z{+1} + shk_z;
+
+!exogenous-variables
+    wy
+

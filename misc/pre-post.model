@@ -1,0 +1,14 @@
+
+!for
+    cpi, gdp
+!do
+
+    !equations(:pre)
+        l_? = 100*log(?);
+        dl_? = 4*(l_? - l_?{-1});
+
+    !equations(:post)
+        l_? = l_?{-1} + dl_?/4;
+        ? = exp(l_?/100);
+
+!end
