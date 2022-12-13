@@ -1,0 +1,128 @@
+
+# AzIM - Long-run sustainability trend module
+
+%{
+```
+      _              _____  ____    ____
+     / \            |_   _||_   \  /   _|
+    / _ \     ____    | |    |   \/   |
+   / ___ \   [_   ]   | |    | |\  /| |
+ _/ /   \ \_  .' /_  _| |_  _| |_\/_| |_
+|____| |____|[_____]|_____||_____||_____|
+
+```
+%}
+
+
+    !variables
+
+        "Nonoil GDP trend, % Q/Q PA" dl_yn_tnd
+        "Nonoil GDP trend" l_yn_tnd
+        "Real exchange rate, TWI % Y/Y PA" dl_re_tw_tnd
+        "Real exchange rate trend, TWI" l_re_tw_tnd
+
+        "Nominal policy rate trend" ni_tnd
+        "CPI inflation target, % Q/Q PA" dl_cpi_tar
+        "Real policy rate trend, % PA" ri_tnd
+        "UIP disparity, % PA" prem_tnd
+
+        "Forex auctions trend, AZN Bil" auct_tnd
+
+
+    !shocks
+
+        shk_dl_yn_tnd
+        shk_dl_cpi_tar
+        shk_dl_re_tw_tnd
+        shk_ri_tnd
+        shk_auct_tnd
+
+
+    !shocks(:tunes)
+
+        tune_dl_yn_tnd
+        tune_dl_cpi_tar
+        tune_dl_re_tw_tnd
+        tune_ri_tnd
+
+
+    !parameters
+
+        ss_dl_cpi
+        ss_dl_yn
+        ss_ri
+        ss_dl_re_tw
+        ss_auct
+
+        c1_dl_yn_tnd
+        c1_dl_cpi_tar
+        c1_ri_tnd
+        c1_dl_re_tw_tnd
+
+
+    !substitutions
+
+        ss_dl_ne_us := (ss_dl_re_tw - ss_dl_ne_cross - (dl_cpi_tar - $ss_dl_cpi_tw$));
+
+
+    !equations
+
+        % Potential output
+        dl_yn_tnd = ...
+            c1_dl_yn_tnd * dl_yn_tnd{-1} ...
+            + (1 - c1_dl_yn_tnd) * ss_dl_yn ...
+            + tune_dl_yn_tnd ...
+            + shk_dl_yn_tnd ...
+        !! dl_yn_tnd = ss_dl_yn;
+
+
+        % Policy neutral nominal rate
+        ni_tnd = ri_tnd + d4l_cpi{+3};
+
+
+        % Inflation target
+        dl_cpi_tar = ...
+            + c1_dl_cpi_tar * dl_cpi_tar{-1} ...
+            + (1 - c1_dl_cpi_tar) * ss_dl_cpi ...
+            + tune_dl_cpi_tar ...
+            + shk_dl_cpi_tar ...
+        !! dl_cpi_tar = ss_dl_cpi;
+
+
+        % Real effective exchange rate
+        dl_re_tw_tnd = ...
+            + c1_dl_re_tw_tnd * dl_re_tw_tnd{-1} ...
+            + (1 - c1_dl_re_tw_tnd) * ss_dl_re_tw ...
+            + tune_dl_re_tw_tnd ...
+            + shk_dl_re_tw_tnd ...
+        !! dl_re_tw_tnd = ss_dl_re_tw;
+
+
+        % Trend in real interest rate
+        ri_tnd = ...
+            + c1_ri_tnd * ri_tnd{-1} ...
+            + (1 - c1_ri_tnd) * ss_ri ...
+            + tune_ri_tnd ...
+            + shk_ri_tnd ...
+        !! ri_tnd = ss_ri;
+
+
+
+        % Real trend parity (=>prem_tnd)
+        ri_tnd - ri_us_tnd = -(dl_re_tw_tnd - ss_dl_ne_cross + ss_dl_cpi_cross) + prem_tnd;
+
+
+        % Forex auctions trend
+        auct_tnd = auct_tnd{-1} + shk_auct_tnd ...
+        !! auct_tnd = ss_auct;
+
+
+        % Rates of change
+        !for
+            yn_tnd
+            re_tw_tnd
+        !do
+            dl_? = 4*(l_? - l_?{-1});
+        !end
+
+

@@ -1,0 +1,25 @@
+
+h2 {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+table td.history-dates {
+    background-color: #eeffee;
+}
+
+table td.ntf-dates {
+    background-color: #eeeeff;
+}
+
+td.rephrase-diff-table-data-cell-diff.rephrase-table-data-positive {
+    color: #0a990a;
+}
+
+td.rephrase-diff-table-data-cell-diff.rephrase-table-data-negative {
+    color: #990a0a;
+}
+
+td.rephrase-table-data-row-title {
+    max-width: 15em;
+}

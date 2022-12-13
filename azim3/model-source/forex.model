@@ -1,0 +1,114 @@
+
+!variables
+
+    ni
+    ni_us
+    l_ne_us
+    l_ne_us_market
+    E_l_ne_us
+    E_l_ne_us_x
+    l_poil_us_gap
+    prem
+    prem_tnd
+    prem_gap
+    int
+    auct
+    auct_tnd
+    auct_gap
+    auct_x
+
+
+!parameters
+
+    c1_l_ne_us_market
+    c1_l_poil_us_gap
+    c1_prem_gap
+    c1_auct_gap
+
+
+!shocks
+
+    shk_l_ne_us_market
+    shk_ni
+    shk_l_ne_us
+    shk_ni_us
+    shk_E_l_ne_us
+    shk_l_poil_us_gap
+    shk_prem_tnd
+    shk_prem_gap
+    shk_auct_gap
+    shk_auct_tnd
+
+
+!equations
+
+    ni - ni_us = ...
+        - 4 * (E_l_ne_us - l_ne_us_market) ...
+        + prem ...
+        - c1_l_ne_us_market * l_poil_us_gap ...
+        + shk_l_ne_us_market ...
+    ;
+
+    E_l_ne_us_x = E_l_ne_us - shk_l_ne_us_market/4;
+
+    int = l_ne_us - l_ne_us_market ...
+    !! int = 0;
+
+    l_ne_us = l_ne_us{-1} + shk_l_ne_us ...
+    !! l_ne_us = 0;
+
+    ni = ni{-1} + shk_ni ...
+    !! ni = 0;
+
+    ni_us = ni_us{-1} + shk_ni_us
+    !! ni_us = 0;
+
+    E_l_ne_us = E_l_ne_us{-1} + shk_E_l_ne_us ...
+    !! E_l_ne_us = 0;
+
+    l_poil_us_gap = c1_l_poil_us_gap * l_poil_us_gap{-1} + shk_l_poil_us_gap ...
+    !! l_poil_us_gap = 0;
+
+    prem = prem_tnd + prem_gap;
+
+    prem_tnd = prem_tnd{-1} + shk_prem_tnd ...
+    !! prem_tnd = 0;
+
+    prem_gap = c1_prem_gap * prem_gap{-1} + shk_prem_gap ...
+    !! prem_gap = 0;
+
+    auct_gap = c1_auct_gap * int + shk_auct_gap;
+
+    auct_tnd = auct_tnd{-1} + shk_auct_tnd;
+
+    auct = auct_tnd + auct_gap;
+
+    auct_x = auct_tnd + (auct_gap - shk_auct_gap);
+
+
+!measurement-variables
+
+    obs_ni
+    obs_ni_us
+    obs_l_ne_us
+    obs_E_l_ne_us
+    obs_l_poil_us_gap
+    obs_auct
+    obs_auct_tnd
+    obs_zero
+
+!measurement-shocks
+
+    shk_int
+
+!measurement-equations
+
+    obs_ni = ni;
+    obs_ni_us = ni_us;
+    obs_l_ne_us = l_ne_us;
+    obs_E_l_ne_us = E_l_ne_us;
+    obs_l_poil_us_gap = l_poil_us_gap;
+    obs_auct = auct;
+    obs_auct_tnd = auct_tnd;
+    obs_zero = int + shk_int;
+
